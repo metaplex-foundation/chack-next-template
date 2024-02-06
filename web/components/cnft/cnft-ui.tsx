@@ -27,7 +27,6 @@ export function CnftUi() {
   const [recipient, setRecipient] = useState<string>()
 
   const umi = useMemo(() => {
-    console.log('refrshing umi')
     return createUmi(connection)
       .use(walletAdapterIdentity(wallet))
       .use(mplTokenMetadata())

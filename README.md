@@ -2,6 +2,11 @@
 
 This project is generated with the [create-solana-dapp](https://github.com/solana-developers/create-solana-dapp) generator.
 
+## cNFT
+
+- Example cNFT code for creating trees, minting and transferring cNFTs can be found in [this file](https://github.com/metaplex-foundation/chack-next-template/blob/main/web/components/cnft/cnft-ui.tsx)
+- Example site is deployed [here](https://chack-next-template.vercel.app/)
+
 ## Getting Started
 
 ### Prerequisites
