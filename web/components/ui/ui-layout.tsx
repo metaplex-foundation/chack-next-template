@@ -18,7 +18,7 @@ import toast, { Toaster } from 'react-hot-toast';
 const pages: { label: string; path: string }[] = [
   { label: 'Account', path: '/account' },
   { label: 'Clusters', path: '/clusters' },
-  { label: 'Counter', path: '/counter' },
+  { label: 'cNFTs', path: '/cnft' },
 ];
 
 export function UiLayout({ children }: { children: ReactNode }) {
@@ -56,7 +56,7 @@ export function UiLayout({ children }: { children: ReactNode }) {
       <ClusterChecker>
         <AccountChecker />
       </ClusterChecker>
-      <div className="flex-grow mx-4 lg:mx-auto">
+      <div className="flex-grow px-12">
         <Suspense
           fallback={
             <div className="text-center my-32">
