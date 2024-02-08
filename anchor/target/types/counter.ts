@@ -1,191 +1,191 @@
 export type Counter = {
-  version: '0.1.0';
-  name: 'counter';
-  instructions: [
+  "version": "0.1.0",
+  "name": "counter",
+  "instructions": [
     {
-      name: 'closeCounter';
-      accounts: [
+      "name": "closeCounter",
+      "accounts": [
         {
-          name: 'payer';
-          isMut: true;
-          isSigner: true;
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'counter';
-          isMut: true;
-          isSigner: false;
+          "name": "counter",
+          "isMut": true,
+          "isSigner": false
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: 'decrement';
-      accounts: [
+      "name": "decrement",
+      "accounts": [
         {
-          name: 'counter';
-          isMut: true;
-          isSigner: false;
+          "name": "counter",
+          "isMut": true,
+          "isSigner": false
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: 'increment';
-      accounts: [
+      "name": "increment",
+      "accounts": [
         {
-          name: 'counter';
-          isMut: true;
-          isSigner: false;
+          "name": "counter",
+          "isMut": true,
+          "isSigner": false
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: 'initializeCounter';
-      accounts: [
+      "name": "initializeCounter",
+      "accounts": [
         {
-          name: 'payer';
-          isMut: true;
-          isSigner: true;
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'counter';
-          isMut: true;
-          isSigner: true;
+          "name": "counter",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'systemProgram';
-          isMut: false;
-          isSigner: false;
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: 'set';
-      accounts: [
+      "name": "set",
+      "accounts": [
         {
-          name: 'counter';
-          isMut: true;
-          isSigner: false;
+          "name": "counter",
+          "isMut": true,
+          "isSigner": false
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: 'value';
-          type: 'u8';
+          "name": "value",
+          "type": "u8"
         }
-      ];
+      ]
     }
-  ];
-  accounts: [
+  ],
+  "accounts": [
     {
-      name: 'counter';
-      type: {
-        kind: 'struct';
-        fields: [
+      "name": "counter",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'count';
-            type: 'u8';
+            "name": "count",
+            "type": "u8"
           }
-        ];
-      };
+        ]
+      }
     }
-  ];
+  ]
 };
 
 export const IDL: Counter = {
-  version: '0.1.0',
-  name: 'counter',
-  instructions: [
+  "version": "0.1.0",
+  "name": "counter",
+  "instructions": [
     {
-      name: 'closeCounter',
-      accounts: [
+      "name": "closeCounter",
+      "accounts": [
         {
-          name: 'payer',
-          isMut: true,
-          isSigner: true,
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'counter',
-          isMut: true,
-          isSigner: false,
-        },
+          "name": "counter",
+          "isMut": true,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'decrement',
-      accounts: [
+      "name": "decrement",
+      "accounts": [
         {
-          name: 'counter',
-          isMut: true,
-          isSigner: false,
-        },
+          "name": "counter",
+          "isMut": true,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'increment',
-      accounts: [
+      "name": "increment",
+      "accounts": [
         {
-          name: 'counter',
-          isMut: true,
-          isSigner: false,
-        },
+          "name": "counter",
+          "isMut": true,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'initializeCounter',
-      accounts: [
+      "name": "initializeCounter",
+      "accounts": [
         {
-          name: 'payer',
-          isMut: true,
-          isSigner: true,
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'counter',
-          isMut: true,
-          isSigner: true,
+          "name": "counter",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'set',
-      accounts: [
+      "name": "set",
+      "accounts": [
         {
-          name: 'counter',
-          isMut: true,
-          isSigner: false,
-        },
+          "name": "counter",
+          "isMut": true,
+          "isSigner": false
+        }
       ],
-      args: [
+      "args": [
         {
-          name: 'value',
-          type: 'u8',
-        },
-      ],
-    },
+          "name": "value",
+          "type": "u8"
+        }
+      ]
+    }
   ],
-  accounts: [
+  "accounts": [
     {
-      name: 'counter',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "counter",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'count',
-            type: 'u8',
-          },
-        ],
-      },
-    },
-  ],
+            "name": "count",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
 };
