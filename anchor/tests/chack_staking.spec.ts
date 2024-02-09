@@ -87,21 +87,23 @@ describe('chack_staking', () => {
       });
   });
 
-  // it('Mint a cNFT', async () => {
-  //   await program.methods
-  //     .mintCnft()
-  //     .accounts({
-  //       treeConfig,
-  //       merkleTree,
-  //       owner: cNftOwner,
-  //       treeOwner,
-  //       mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
-  //      })
-  //      .signers([cNftOwnerKeypair])
-  //      .rpc({
-  //       skipPreflight:true
-  //     });
-  // });
+  it('Mint a cNFT', async () => {
+    await program.methods
+      .mintCnft()
+      .accounts({
+        treeConfig,
+        merkleTree,
+        owner: cNftOwner,
+        treeOwner,
+        mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
+        logWrapper: SPL_NOOP_PROGRAM_ID,
+        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+       })
+       .signers([cNftOwnerKeypair])
+       .rpc({
+        skipPreflight:true
+      });
+  });
 
   // it('Stake a cNFT', async () => {
   //   // TODO Get all this stuff for real.

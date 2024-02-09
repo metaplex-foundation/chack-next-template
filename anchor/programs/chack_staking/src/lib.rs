@@ -26,7 +26,7 @@ pub mod chack_staking {
             .tree_config(&ctx.accounts.tree_config)
             .merkle_tree(&ctx.accounts.merkle_tree)
             .payer(&ctx.accounts.payer)
-            .tree_creator(&ctx.accounts.payer)
+            .tree_creator(&ctx.accounts.tree_owner)
             .log_wrapper(&ctx.accounts.log_wrapper)
             .compression_program(&ctx.accounts.compression_program)
             .system_program(&ctx.accounts.system_program)
@@ -69,8 +69,11 @@ pub mod chack_staking {
             .leaf_owner(&ctx.accounts.owner)
             .leaf_delegate(&ctx.accounts.owner)
             .merkle_tree(&ctx.accounts.merkle_tree)
-            .payer(&ctx.accounts.owner.to_account_info())
-            .tree_creator_or_delegate(&ctx.accounts.tree_owner.to_account_info())
+            .payer(&ctx.accounts.owner)
+            .tree_creator_or_delegate(&ctx.accounts.tree_owner)
+            .log_wrapper(&ctx.accounts.log_wrapper)
+            .compression_program(&ctx.accounts.compression_program)
+            .system_program(&ctx.accounts.system_program)
             .metadata(metadata)
             .invoke_signed(&[&[
                 b"tree_owner",
