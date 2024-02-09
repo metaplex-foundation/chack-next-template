@@ -18,3 +18,4 @@ default = []
 [dependencies]
 anchor-lang = "0.28.0"
 mpl-bubblegum = "1.2.0"
+spl-account-compression = { version="0.2.0", features = ["cpi"] }

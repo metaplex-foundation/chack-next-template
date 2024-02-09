@@ -12,7 +12,7 @@ export type ChackStaking = {
         },
         {
           "name": "merkleTree",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -27,6 +27,21 @@ export type ChackStaking = {
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -69,6 +84,21 @@ export type ChackStaking = {
           "name": "mplBubblegumProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -98,6 +128,16 @@ export type ChackStaking = {
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -170,6 +210,16 @@ export type ChackStaking = {
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -248,7 +298,7 @@ export const IDL: ChackStaking = {
         },
         {
           "name": "merkleTree",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -263,6 +313,21 @@ export const IDL: ChackStaking = {
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -305,6 +370,21 @@ export const IDL: ChackStaking = {
           "name": "mplBubblegumProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -334,6 +414,16 @@ export const IDL: ChackStaking = {
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -406,6 +496,16 @@ export const IDL: ChackStaking = {
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
           "isMut": false,
           "isSigner": false
         },

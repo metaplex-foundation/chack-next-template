@@ -12,7 +12,7 @@
         },
         {
           "name": "merkleTree",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -27,6 +27,21 @@
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -69,6 +84,21 @@
           "name": "mplBubblegumProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -98,6 +128,16 @@
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -170,6 +210,16 @@
         },
         {
           "name": "mplBubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
           "isMut": false,
           "isSigner": false
         },

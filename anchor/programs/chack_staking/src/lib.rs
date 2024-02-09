@@ -5,6 +5,7 @@ use mpl_bubblegum::{
     instructions::{CreateTreeConfigCpiBuilder, MintV1CpiBuilder, TransferCpiBuilder},
     types::{Creator, MetadataArgs, TokenProgramVersion, TokenStandard},
 };
+use spl_account_compression::{program::SplAccountCompression, Noop};
 
 declare_id!("C7NwfAHcZkknHKaUYHdLzoEqykffYDQDTX7MUMbhmpML");
 
@@ -25,11 +26,15 @@ pub mod chack_staking {
             .tree_config(&ctx.accounts.tree_config)
             .merkle_tree(&ctx.accounts.merkle_tree)
             .payer(&ctx.accounts.payer)
-            .tree_creator(&ctx.accounts.tree_owner.to_account_info())
+            .tree_creator(&ctx.accounts.payer)
+            .log_wrapper(&ctx.accounts.log_wrapper)
+            .compression_program(&ctx.accounts.compression_program)
+            .system_program(&ctx.accounts.system_program)
             .max_depth(max_depth)
             .max_buffer_size(max_buffer_size)
             .invoke_signed(&[&[
-                ctx.accounts.tree_owner.key().as_ref(),
+                b"tree_owner",
+                ctx.accounts.merkle_tree.key().as_ref(),
                 &[ctx.bumps["tree_owner"]],
             ]])?;
 
@@ -68,7 +73,8 @@ pub mod chack_staking {
             .tree_creator_or_delegate(&ctx.accounts.tree_owner.to_account_info())
             .metadata(metadata)
             .invoke_signed(&[&[
-                ctx.accounts.tree_owner.key().as_ref(),
+                b"tree_owner",
+                ctx.accounts.merkle_tree.key().as_ref(),
                 &[ctx.bumps["tree_owner"]],
             ]])?;
 
@@ -139,6 +145,7 @@ pub mod chack_staking {
                     .collect::<Vec<(&AccountInfo, bool, bool)>>(),
             )
             .invoke_signed(&[&[
+                b"staking_details",
                 ctx.accounts.staking_details.key().as_ref(),
                 &[ctx.bumps["staking_details"]],
             ]])?;
@@ -161,17 +168,21 @@ pub struct CreateTree<'info> {
     #[account(mut)]
     /// CHECK: This account is modified in the downstream program.
     pub tree_config: UncheckedAccount<'info>,
+    #[account(mut)]
     /// CHECK: This account must be all zeros.
     pub merkle_tree: UncheckedAccount<'info>,
     #[account(mut)]
     pub payer: Signer<'info>,
     #[account(
-        seeds = ["tree_owner".as_ref(), merkle_tree.key().as_ref()],
+        seeds = [b"tree_owner", merkle_tree.key().as_ref()],
         bump
     )]
     /// CHECK: This account used as a signing PDA only.
     pub tree_owner: UncheckedAccount<'info>,
     pub mpl_bubblegum_program: Program<'info, MplBubblegum>,
+    pub log_wrapper: Program<'info, Noop>,
+    pub compression_program: Program<'info, SplAccountCompression>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -191,6 +202,9 @@ pub struct Mint<'info> {
     /// CHECK: This account used as a signing PDA only.
     pub tree_owner: UncheckedAccount<'info>,
     pub mpl_bubblegum_program: Program<'info, MplBubblegum>,
+    pub log_wrapper: Program<'info, Noop>,
+    pub compression_program: Program<'info, SplAccountCompression>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -212,6 +226,8 @@ pub struct Stake<'info> {
     )]
     pub staking_details: Account<'info, StakingDetails>,
     pub mpl_bubblegum_program: Program<'info, MplBubblegum>,
+    pub log_wrapper: Program<'info, Noop>,
+    pub compression_program: Program<'info, SplAccountCompression>,
     pub system_program: Program<'info, System>,
 }
 
@@ -228,11 +244,13 @@ pub struct Unstake<'info> {
     #[account(
         mut,
         close = owner,
-        seeds = ["staking_details".as_ref(), merkle_tree.key().as_ref(), owner.key().as_ref()],
+        seeds = [b"staking_details", merkle_tree.key().as_ref(), owner.key().as_ref()],
         bump
     )]
     pub staking_details: Account<'info, StakingDetails>,
     pub mpl_bubblegum_program: Program<'info, MplBubblegum>,
+    pub log_wrapper: Program<'info, Noop>,
+    pub compression_program: Program<'info, SplAccountCompression>,
     pub system_program: Program<'info, System>,
 }
 
