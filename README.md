@@ -29,7 +29,7 @@ cd <repo-name>
 #### Install Dependencies
 
 ```shell
-npm run install
+npm install
 ```
 
 #### Start the web app
@@ -48,6 +48,12 @@ This is a Solana program written in Rust using the Anchor framework.
 
 You can use any normal anchor commands. Either move to the `anchor` directory and run the `anchor` command or prefix the command with `npm run`, eg: `npm run anchor`.
 
+#### Install Dependencies needed for Anchor as well
+
+```shell
+npm install
+```
+
 #### Sync the program id:
 
 Running this command will create a new keypair in the `anchor/target/deploy` directory and save the address to the Anchor config file and update the `declare_id!` macro in the `./src/lib.rs` file of the program.
@@ -62,6 +68,11 @@ npm run anchor keys sync
 
 ```shell
 npm run anchor-build
+```
+
+#### Dump Bubblegum:
+```shell
+./dump_bubblegum.sh
 ```
 
 #### Start the test validator with the program deployed:
