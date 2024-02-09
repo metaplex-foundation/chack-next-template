@@ -9,7 +9,7 @@ use mpl_bubblegum::{
 declare_id!("CounNZdmsQmWh7uVngV9FXW2dZ6zAgbJyYsvBpqbykg");
 
 #[program]
-pub mod counter {
+pub mod chack_staking {
     use super::*;
 
     pub fn create_tree(

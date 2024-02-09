@@ -1,12 +1,12 @@
 [package]
-name = "counter"
+name = "chack_staking"
 version = "0.1.0"
-description = "Created with Anchor"
+description = "Staking demo program for cHACK"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "counter"
+name = "chack_staking"
 
 [features]
 no-entrypoint = []
