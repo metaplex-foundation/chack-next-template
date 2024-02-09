@@ -6,7 +6,7 @@ use mpl_bubblegum::{
     types::{Creator, MetadataArgs, TokenProgramVersion, TokenStandard},
 };
 
-declare_id!("CounNZdmsQmWh7uVngV9FXW2dZ6zAgbJyYsvBpqbykg");
+declare_id!("C7NwfAHcZkknHKaUYHdLzoEqykffYDQDTX7MUMbhmpML");
 
 #[program]
 pub mod chack_staking {
@@ -185,7 +185,7 @@ pub struct Mint<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
     #[account(
-        seeds = ["tree_owner".as_ref(), merkle_tree.key().as_ref()],
+        seeds = [b"tree_owner", merkle_tree.key().as_ref()],
         bump
     )]
     /// CHECK: This account used as a signing PDA only.
@@ -205,7 +205,7 @@ pub struct Stake<'info> {
     pub owner: Signer<'info>,
     #[account(
         init,
-        seeds = ["staking_details".as_ref(), merkle_tree.key().as_ref(), owner.key().as_ref()],
+        seeds = [b"staking_details", merkle_tree.key().as_ref(), owner.key().as_ref()],
         space = 32 + StakingDetails::INIT_SPACE, // `Pubkey`` + discriminator.
         payer = owner,
         bump

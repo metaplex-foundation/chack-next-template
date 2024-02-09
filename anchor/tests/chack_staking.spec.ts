@@ -3,10 +3,8 @@ import { Program } from '@coral-xyz/anchor';
 import { MPL_BUBBLEGUM_PROGRAM_ID } from '@metaplex-foundation/mpl-bubblegum'
 
 import {
-  Connection,
   Keypair,
   PublicKey,
-  sendAndConfirmTransaction,
   SystemProgram,
   Transaction,
 } from '@solana/web3.js';
@@ -81,7 +79,9 @@ describe('chack_staking', () => {
         treeOwner,
         mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
       })
-      .rpc();
+      .rpc({
+        skipPreflight:true
+      });
   });
 
   it('Mint a cNFT', async () => {
@@ -95,7 +95,9 @@ describe('chack_staking', () => {
         mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
        })
        .signers([cNftOwnerKeypair])
-      .rpc();
+       .rpc({
+        skipPreflight:true
+      });
   });
 
   it('Stake a cNFT', async () => {
@@ -118,7 +120,9 @@ describe('chack_staking', () => {
         mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
        })
        .signers([cNftOwnerKeypair])
-      .rpc();
+       .rpc({
+        skipPreflight:true
+      });
 
     const currentStakingDetails = await program.account.stakingDetails.fetch(
       stakingDetails
@@ -147,7 +151,9 @@ describe('chack_staking', () => {
         mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
        })
        .signers([cNftOwnerKeypair])
-      .rpc();
+       .rpc({
+        skipPreflight:true
+      });
 
     // The account should no longer exist, returning null.
     const currentStakingDetails = await program.account.stakingDetails.fetchNullable(

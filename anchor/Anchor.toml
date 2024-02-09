@@ -5,7 +5,11 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-chack_staking = "EuJfgknXicf6iZASeagt5U6XDDPpLTQrvWPW31vgAwo8"
+chack_staking = "C7NwfAHcZkknHKaUYHdLzoEqykffYDQDTX7MUMbhmpML"
+
+[[test.genesis]]
+address = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY"
+program = "target/deploy/bubblegum.so"
 
 [registry]
 url = "https://api.apr.dev"

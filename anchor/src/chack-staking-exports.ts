@@ -10,7 +10,7 @@ export type ChackStakingProgram = Program<ChackStaking>;
 
 // After updating your program ID (e.g. after running `anchor keys sync`) update the value below.
 export const CHACK_STAKING_PROGRAM_ID = new PublicKey(
-  'CounNZdmsQmWh7uVngV9FXW2dZ6zAgbJyYsvBpqbykg'
+  'C7NwfAHcZkknHKaUYHdLzoEqykffYDQDTX7MUMbhmpML'
 );
 
 // This is a helper function to get the program ID for the Counter program depending on the cluster.
@@ -20,7 +20,7 @@ export function getChackStakingProgramId(cluster: Cluster) {
     case 'testnet':
     case 'mainnet-beta':
       // You only need to update this if you deploy your program on one of these clusters.
-      return new PublicKey('CounNZdmsQmWh7uVngV9FXW2dZ6zAgbJyYsvBpqbykg');
+      return new PublicKey('C7NwfAHcZkknHKaUYHdLzoEqykffYDQDTX7MUMbhmpML');
     default:
       return CHACK_STAKING_PROGRAM_ID;
   }
