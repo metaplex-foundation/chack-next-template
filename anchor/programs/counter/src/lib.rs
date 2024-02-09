@@ -192,6 +192,7 @@ pub struct Mint<'info> {
     pub tree_owner: UncheckedAccount<'info>,
     pub mpl_bubblegum_program: Program<'info, MplBubblegum>,
 }
+
 #[derive(Accounts)]
 pub struct Stake<'info> {
     #[account(mut)]
