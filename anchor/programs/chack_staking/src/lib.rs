@@ -156,6 +156,7 @@ pub mod chack_staking {
             .invoke_signed(&[&[
                 b"staking_details",
                 ctx.accounts.staking_details.key().as_ref(),
+                ctx.accounts.owner.key().as_ref(),
                 &[ctx.bumps["staking_details"]],
             ]])?;
 
@@ -177,7 +178,7 @@ pub struct CreateTree<'info> {
     #[account(mut)]
     /// CHECK: This account is modified in the downstream program.
     pub tree_config: UncheckedAccount<'info>,
-    #[account(mut)]
+    #[account(zero)]
     /// CHECK: This account must be all zeros.
     pub merkle_tree: UncheckedAccount<'info>,
     #[account(mut)]

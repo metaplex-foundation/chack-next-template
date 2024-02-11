@@ -191,36 +191,45 @@ describe('chack_staking', () => {
     expect(currentStakingDetails.owner).toEqual(cNftOwner);
   }, 50000);
 
-  // it('Unstake a cNFT', async () => {
-  //   // TODO Get all this stuff for real.
-  //   const root = new Array(32).fill(0);
-  //   const dataHash = new Array(32).fill(0);
-  //   const creatorHash = new Array(32).fill(0);
-  //   const nonce = 0;
-  //   const index = 0;
+  it('Unstake a cNFT', async () => {
+    // Get the current Merkle tree root from the account.
+    const accountInfo = await provider.connection.getAccountInfo(merkleTree, { commitment: 'confirmed' });
+    const account = ConcurrentMerkleTreeAccount.fromBuffer(accountInfo!.data!);
+    const root = Array.from(account.getCurrentRoot())
 
-  //   // TODO: Add proofs.
+    try {
+      await program.methods
+        .unstakeCnft(
+          root,
+          dataHash,
+          creatorHash,
+          new anchor.BN(0),
+          new anchor.BN(0),
+        )
+        .accounts({
+          treeConfig,
+          merkleTree,
+          owner: cNftOwner,
+          stakingDetails,
+          mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
+          logWrapper: SPL_NOOP_PROGRAM_ID,
+          compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+        })
+        .signers([cNftOwnerKeypair])
+        .rpc({
+          skipPreflight:true
+        });
+      } catch(err) {
+        console.log(err.message);
+        await delay(30000);
+      }
 
-  //   await program.methods
-  //     .unstakeCnft(root, dataHash, creatorHash, nonce, index)
-  //     .accounts({
-  //       treeConfig,
-  //       merkleTree,
-  //       owner: cNftOwner,
-  //       stakingDetails,
-  //       mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
-  //      })
-  //      .signers([cNftOwnerKeypair])
-  //      .rpc({
-  //       skipPreflight:true
-  //     });
-
-  //   // The account should no longer exist, returning null.
-  //   const currentStakingDetails = await program.account.stakingDetails.fetchNullable(
-  //     stakingDetails
-  //   );
-  //   expect(currentStakingDetails).toBeNull();
-  // });
+    // The account should no longer exist, returning null.
+    const currentStakingDetails = await program.account.stakingDetails.fetchNullable(
+      stakingDetails
+    );
+    expect(currentStakingDetails).toBeNull();
+  }, 50000);
 });
 
 async function createMerkleTreeAccount(
