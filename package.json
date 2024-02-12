@@ -19,6 +19,7 @@
     "@metaplex-foundation/umi": "^0.9.1",
     "@metaplex-foundation/umi-bundle-defaults": "^0.9.1",
     "@metaplex-foundation/umi-signer-wallet-adapters": "^0.9.1",
+    "@metaplex-foundation/umi-web3js-adapters": "^0.9.1",
     "@solana-developers/preset-next": "2.0.1",
     "@solana/spl-token": "0.3.9",
     "@solana/wallet-adapter-base": "^0.9.23",

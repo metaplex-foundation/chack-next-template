@@ -9,7 +9,7 @@ import {
   TokenStandard,
 } from '@metaplex-foundation/mpl-bubblegum'
 
-import { publicKey } from '@metaplex-foundation/umi'
+import { fromWeb3JsPublicKey } from '@metaplex-foundation/umi-web3js-adapters'
 
 import {
   Keypair,
@@ -84,7 +84,7 @@ describe('chack_staking', () => {
     symbol: 'cNFT',
     uri: 'https://c.nft',
     creators: [{
-      address: publicKey(treeOwner.toBase58()),
+      address: fromWeb3JsPublicKey(treeOwner),
       verified: false,
       share: 100,
     }],
