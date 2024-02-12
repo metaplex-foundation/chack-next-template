@@ -102,7 +102,7 @@ describe('chack_staking', () => {
   const dataHash = Array.from(hashMetadataData(metadata));
   const creatorHash = Array.from(hashMetadataCreators(metadata.creators));
 
-  it('Create a Tree with ChackStaking', async () => {
+  it('Create a tree', async () => {
     // Create Merkle tree account.
     await createMerkleTreeAccount(
       provider,
