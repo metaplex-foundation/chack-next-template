@@ -9,7 +9,7 @@ import {
   TokenStandard,
 } from '@metaplex-foundation/mpl-bubblegum'
 
-import { PublicKey as UmiPublicKey } from '@metaplex-foundation/umi'
+import { publicKey } from '@metaplex-foundation/umi'
 
 import {
   Keypair,
@@ -84,7 +84,7 @@ describe('chack_staking', () => {
     symbol: 'cNFT',
     uri: 'https://c.nft',
     creators: [{
-      address: treeOwner as unknown as UmiPublicKey,
+      address: publicKey(treeOwner.toBase58()),
       verified: false,
       share: 100,
     }],
@@ -180,7 +180,7 @@ describe('chack_staking', () => {
       });
     } catch(err) {
       console.log(err.message);
-      await delay(30000);
+      await delay(1000);
     }
 
     // Verify `cNftOwnerKeypair`'s `PublicKey` is stored in the `stakingDetails` account.
@@ -189,7 +189,7 @@ describe('chack_staking', () => {
     );
 
     expect(currentStakingDetails.owner).toEqual(cNftOwner);
-  }, 50000);
+  }, 30000);
 
   it('Unstake a cNFT', async () => {
     // Get the current Merkle tree root from the account.
@@ -221,7 +221,7 @@ describe('chack_staking', () => {
         });
       } catch(err) {
         console.log(err.message);
-        await delay(30000);
+        await delay(1000);
       }
 
     // The account should no longer exist, returning null.
@@ -229,7 +229,7 @@ describe('chack_staking', () => {
       stakingDetails
     );
     expect(currentStakingDetails).toBeNull();
-  }, 50000);
+  }, 30000);
 });
 
 async function createMerkleTreeAccount(

@@ -155,7 +155,7 @@ pub mod chack_staking {
             )
             .invoke_signed(&[&[
                 b"staking_details",
-                ctx.accounts.staking_details.key().as_ref(),
+                ctx.accounts.merkle_tree.key().as_ref(),
                 ctx.accounts.owner.key().as_ref(),
                 &[ctx.bumps["staking_details"]],
             ]])?;
