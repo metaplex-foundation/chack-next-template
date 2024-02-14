@@ -1,19 +1,13 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
-import {
-  hashMetadataCreators,
-  hashMetadataData,
-  MetadataArgsArgs,
-  MPL_BUBBLEGUM_PROGRAM_ID,
-  TokenProgramVersion,
-  TokenStandard,
-} from '@metaplex-foundation/mpl-bubblegum'
 
-import { fromWeb3JsPublicKey } from '@metaplex-foundation/umi-web3js-adapters'
+import {
+  MPL_BUBBLEGUM_PROGRAM_ID,
+  getLeafSchemaSerializer,
+} from '@metaplex-foundation/mpl-bubblegum';
 
 import {
   Keypair,
-  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
   Transaction,
@@ -21,7 +15,6 @@ import {
 
 import {
   getConcurrentMerkleTreeAccountSize,
-  ConcurrentMerkleTreeAccount,
   SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
   SPL_NOOP_PROGRAM_ID,
   ValidDepthSizePair,
@@ -29,6 +22,7 @@ import {
 
 import { ChackStaking } from '../target/types/chack_staking';
 
+import bs58 from 'bs58';
 
 function delay(ms: number) {
   return new Promise( resolve => setTimeout(resolve, ms) );
@@ -41,10 +35,14 @@ describe('chack_staking', () => {
   const payer = provider.wallet as anchor.Wallet;
   const program = anchor.workspace.ChackStaking as Program<ChackStaking>;
 
+  // Create a keypair that will hold the Merkle tree underlying data structure.
   const merkleTreeKeypair = Keypair.generate();
   const merkleTree = merkleTreeKeypair.publicKey;
 
-  const cNftOwnerKeypair = Keypair.generate();
+  // This will be our cNFT owner.  Using a known keypair derivation so that
+  // devnet SOL can be airdropped separately.
+  const seed = Uint8Array.from(Buffer.from('chack-test-keypair-cnft-owner777'));
+  const cNftOwnerKeypair = Keypair.fromSeed(seed);
   const cNftOwner = cNftOwnerKeypair.publicKey;
 
   // This type enforces a valid `maxDepth` and `maxBufferSize` pair.
@@ -53,13 +51,13 @@ describe('chack_staking', () => {
     maxBufferSize: 8,
   };
 
-  // Find the `treeConfig` PDA.
+  // Find the Bubblegum `treeConfig` PDA.
   const [treeConfig, _treeConfigBump] = PublicKey.findProgramAddressSync(
     [merkleTree.toBuffer()],
     new PublicKey(MPL_BUBBLEGUM_PROGRAM_ID),
   );
 
-  // Find the `treeOwner` PDA.
+  // Find the cHACK Staking program `treeOwner` PDA.
   const [treeOwner, _treeOwnerBump] = PublicKey.findProgramAddressSync(
     [
       anchor.utils.bytes.utf8.encode('tree_owner'),
@@ -68,7 +66,7 @@ describe('chack_staking', () => {
     program.programId
   )
 
-  // Find the stakingDetails PDA for the specific cNFT owner.
+  // Find the cHACK Staking program `stakingDetails` PDA (for the specific cNFT owner).
   const [stakingDetails, _stakingDetailsBump] = PublicKey.findProgramAddressSync(
     [
       anchor.utils.bytes.utf8.encode('staking_details'),
@@ -78,29 +76,13 @@ describe('chack_staking', () => {
     program.programId
   )
 
-  // This is the same Metadata that the program uses.
-  const metadata: MetadataArgsArgs  = {
-    name: 'cNFT',
-    symbol: 'cNFT',
-    uri: 'https://c.nft',
-    creators: [{
-      address: fromWeb3JsPublicKey(treeOwner),
-      verified: false,
-      share: 100,
-    }],
-    editionNonce: null,
-    tokenProgramVersion: TokenProgramVersion.Original,
-    tokenStandard: TokenStandard.NonFungible,
-    uses: null,
-    collection: null,
-    primarySaleHappened: true,
-    sellerFeeBasisPoints: 500,
-    isMutable: true,
-  };
+  // Data that will be retrieved later.
+  let assetId: string = "";
 
-  // These are the hashes needed for transferring.
-  const dataHash = Array.from(hashMetadataData(metadata));
-  const creatorHash = Array.from(hashMetadataCreators(metadata.creators));
+  let dataHash: undefined | string;
+  let creatorHash: undefined | string;
+  let root: undefined | string;
+  let leafId: undefined | string;
 
   it('Create a tree', async () => {
     // Create Merkle tree account.
@@ -125,11 +107,11 @@ describe('chack_staking', () => {
       .rpc({
         skipPreflight:true
       });
-  });
+  }, 60000);
 
   it('Mint a cNFT', async () => {
     // Mint a cNFT owned by `cNftOwnerKeypair`.
-    await program.methods
+    const signature = await program.methods
       .mintCnft()
       .accounts({
         treeConfig,
@@ -142,30 +124,127 @@ describe('chack_staking', () => {
        })
        .signers([cNftOwnerKeypair])
        .rpc({
-        skipPreflight:true
+        commitment: 'finalized',  // Use 'finalized' so that `getTransaction` below succeeds.
+        skipPreflight: true
       });
-  });
+      console.log('Mint tx: ', signature);
+
+      // Get the mint transaction.
+      let response = await provider.connection.getTransaction(
+        signature,
+        {
+          commitment: 'confirmed',
+          maxSupportedTransactionVersion: 0
+        }
+      );
+
+      // Find the inner instruction that represents the Bubblegum call to the Noop program.
+      let innerInstructions = response?.meta?.innerInstructions;
+      console.log(innerInstructions);
+      if (!innerInstructions) {
+        throw new Error('Could not parse leaf from transaction');
+      }
+
+      // Deserialize the data from the call to the Noop program into a `LeafSchema` event struct.
+      let buffer = bs58.decode(innerInstructions[0].instructions[1].data);
+      const leaf = getLeafSchemaSerializer().deserialize(
+          // Discard the first 8 bytes, which are the Anchor discriminator.
+          buffer.slice(8)
+      );
+
+      // The `assetId` is the `id` field of the `LeafSchema` event struct.
+      assetId = leaf[0].id.toString();
+      console.log("Asset ID: ", assetId);
+  }, 60000);
 
   it('Stake a cNFT', async () => {
-    // The `cNftOwnerKeypair` will need some lamports since the stake instruction
-    // initializes the `stakingDetails` PDA.
-    await provider.connection.requestAirdrop(cNftOwner, LAMPORTS_PER_SOL);
+    console.log("Delay 10 seconds for indexers to catch up!!!");
+    await delay(10000);
 
-    // Get the current Merkle tree root from the account.
-    const accountInfo = await provider.connection.getAccountInfo(merkleTree, { commitment: 'confirmed' });
-    const account = ConcurrentMerkleTreeAccount.fromBuffer(accountInfo!.data!);
-    const root = Array.from(account.getCurrentRoot())
+    // Call `getAsset` from an RPC DAS provider.
+    let asset = await getAsset(assetId);
+    if (!asset) {
+      throw new Error('Could not get asset from RPC');
+    }
 
-    // Stake `cNftOwnerKeypair`'s cNFT.
-    try {
-      await program.methods
-      .stakeCnft(
-        root,
-        dataHash,
-        creatorHash,
-        new anchor.BN(0),
-        new anchor.BN(0),
-      ).accounts({
+    // Get the `dataHash`, `creatorHash`, and `leafId` from the RPC response.
+    dataHash = asset.result?.compression?.data_hash;
+    creatorHash = asset.result?.compression?.creator_hash;
+    leafId = asset.result?.compression?.leaf_id;
+    if (!dataHash || !creatorHash || leafId == undefined) {
+      throw new Error('Could not find required asset data in RPC response');
+    }
+
+    // Call `getAssetProof` from an RPC DAS provider.
+    let assetProof = await getAssetProof(assetId);
+    if (!assetProof) {
+      throw new Error('Could not get asset proof from RPC');
+    }
+
+    // Get the Merkle tree root from the RPC response.
+    root = assetProof?.result?.root;
+    if (!root) {
+      throw new Error('Could not find root in RPC response');
+    }
+
+    // Stake `cNftOwnerKeypair`'s cNFT, sending in the cNFT parameters from the RPC DAS provider.
+    const signature = await program.methods
+    .stakeCnft(
+      Array.from(bs58.decode(root)),
+      Array.from(bs58.decode(dataHash)),
+      Array.from(bs58.decode(creatorHash)),
+      new anchor.BN(leafId),
+      new anchor.BN(leafId),
+    ).accounts({
+      treeConfig,
+      merkleTree,
+      owner: cNftOwner,
+      stakingDetails,
+      mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
+      logWrapper: SPL_NOOP_PROGRAM_ID,
+      compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+      })
+      .signers([cNftOwnerKeypair])
+      .rpc({
+      skipPreflight:true
+    });
+    console.log('Stake cNFT tx: ', signature);
+
+    // Verify `cNftOwnerKeypair`'s `PublicKey` is stored in the `stakingDetails` account.
+    const currentStakingDetails = await program.account.stakingDetails.fetch(
+      stakingDetails
+    );
+    expect(currentStakingDetails.owner).toEqual(cNftOwner);
+  }, 60000);
+
+  it('Unstake a cNFT', async () => {
+    // Call `getAssetProof` from an RPC DAS provider, since the Merkle tree changed when
+    // the cNFT was transferred to a new owner by the `stakeCnft` instruction.
+    let assetProof = await getAssetProof(assetId);
+    if (!assetProof) {
+      throw new Error('Could not get Asset from RPC');
+    }
+    // Get the updated Merkle tree root from the RPC response.
+    root = assetProof?.result?.root;
+    if (!root) {
+      throw new Error('Could not find root in RPC response');
+    }
+
+    if (!dataHash || !creatorHash || leafId == undefined) {
+      throw new Error('Could not find required asset data in RPC response');
+    }
+
+    // Stake `cNftOwnerKeypair`'s cNFT.  The `dataHash`, `creatorHash`, and `leafId` values can be
+    // reused from the previous RPC call since those were not changed by transferring the cNFT.
+    const signature = await program.methods
+      .unstakeCnft(
+        Array.from(bs58.decode(root)),
+        Array.from(bs58.decode(dataHash)),
+        Array.from(bs58.decode(creatorHash)),
+        new anchor.BN(leafId),
+        new anchor.BN(leafId),
+      )
+      .accounts({
         treeConfig,
         merkleTree,
         owner: cNftOwner,
@@ -173,65 +252,23 @@ describe('chack_staking', () => {
         mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
         logWrapper: SPL_NOOP_PROGRAM_ID,
         compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-       })
-       .signers([cNftOwnerKeypair])
-       .rpc({
+      })
+      .signers([cNftOwnerKeypair])
+      .rpc({
         skipPreflight:true
       });
-    } catch(err) {
-      console.log(err.message);
-      await delay(1000);
-    }
+      console.log('Unstake cNFT tx: ', signature);
 
-    // Verify `cNftOwnerKeypair`'s `PublicKey` is stored in the `stakingDetails` account.
-    const currentStakingDetails = await program.account.stakingDetails.fetch(
-      stakingDetails
-    );
-
-    expect(currentStakingDetails.owner).toEqual(cNftOwner);
-  }, 30000);
-
-  it('Unstake a cNFT', async () => {
-    // Get the current Merkle tree root from the account.
-    const accountInfo = await provider.connection.getAccountInfo(merkleTree, { commitment: 'confirmed' });
-    const account = ConcurrentMerkleTreeAccount.fromBuffer(accountInfo!.data!);
-    const root = Array.from(account.getCurrentRoot())
-
-    try {
-      await program.methods
-        .unstakeCnft(
-          root,
-          dataHash,
-          creatorHash,
-          new anchor.BN(0),
-          new anchor.BN(0),
-        )
-        .accounts({
-          treeConfig,
-          merkleTree,
-          owner: cNftOwner,
-          stakingDetails,
-          mplBubblegumProgram: MPL_BUBBLEGUM_PROGRAM_ID,
-          logWrapper: SPL_NOOP_PROGRAM_ID,
-          compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-        })
-        .signers([cNftOwnerKeypair])
-        .rpc({
-          skipPreflight:true
-        });
-      } catch(err) {
-        console.log(err.message);
-        await delay(1000);
-      }
-
-    // The account should no longer exist, returning null.
+    // The `stakingDetails` account should no longer exist, returning null.
     const currentStakingDetails = await program.account.stakingDetails.fetchNullable(
       stakingDetails
     );
     expect(currentStakingDetails).toBeNull();
-  }, 30000);
+  }, 60000);
 });
 
+// Create a Merkle tree account of the correct size using the valid `maxDepth` and `maxBufferSize`
+// pair passed in via `depthSizePair`.
 async function createMerkleTreeAccount(
   provider: anchor.AnchorProvider,
   merkleTreeKeypair: Keypair,
@@ -239,11 +276,13 @@ async function createMerkleTreeAccount(
 ) {
   const merkleTree = merkleTreeKeypair.publicKey;
 
+  // Use the helper method to calculate the required space.
   const space = getConcurrentMerkleTreeAccountSize(
     depthSizePair.maxDepth,
     depthSizePair.maxBufferSize,
   );
 
+  // Create the account for the Merkle tree.
   const allocTreeIx = SystemProgram.createAccount({
     fromPubkey: provider.wallet.publicKey,
     newAccountPubkey: merkleTree,
@@ -261,4 +300,50 @@ async function createMerkleTreeAccount(
       skipPreflight: true,
     }
   );
+}
+
+// Call `getAsset` from an RPC DAS provider.
+async function getAsset(assetId: string): Promise<any> {
+  const result = await rpc('getAsset', assetId);
+  return result;
+}
+
+// Call `getAssetProof` from an RPC DAS provider.
+async function getAssetProof(assetId: string): Promise<any> {
+  const result = await rpc('getAssetProof', assetId);
+  return result;
+}
+
+// Low-level helper function to call the RPC DAS methods used by these tests.  Note it would not
+// work for other DAS methods such as `getAssetsByCreator`, which have different parameters.
+async function rpc(
+  method: string,
+  assetId: string
+): Promise<any> {
+  const url = process.env.READ_API_RPC_DEVNET;
+
+  if (!url) {
+    throw new Error('READ_API_RPC_DEVNET environment variable is not set.');
+  }
+
+  // Avoid rate limiting for RPC endpoint!
+  await delay(5000);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: '0',
+      method: method,
+      params: {
+        id: assetId
+      },
+    }),
+  });
+  const result = await response.json();
+  console.log(method, ": ", result);
+  return result;
 }

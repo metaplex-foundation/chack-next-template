@@ -7,7 +7,7 @@ use mpl_bubblegum::{
 };
 use spl_account_compression::{program::SplAccountCompression, Noop};
 
-declare_id!("C7NwfAHcZkknHKaUYHdLzoEqykffYDQDTX7MUMbhmpML");
+declare_id!("x3W9hJnX2fGW2tLKKyCgorX9XbYdQAQZXQw1mJFUA8D");
 
 #[program]
 pub mod chack_staking {

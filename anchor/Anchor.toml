@@ -4,14 +4,14 @@
 seeds = false
 skip-lint = false
 
-[programs.localnet]
-chack_staking = "C7NwfAHcZkknHKaUYHdLzoEqykffYDQDTX7MUMbhmpML"
+[programs.devnet]
+chack_staking = "4XPcw6GVcxTq56ABXMALvdbkqvsY35d6iZLWm46m8mbp"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
@@ -21,11 +21,6 @@ test = "../node_modules/.bin/nx run anchor:jest"
 startup_wait = 5000
 shutdown_wait = 2000
 upgradeable = false
-
-[test.validator]
-bind_address = "127.0.0.1"
-ledger = ".anchor/test-ledger"
-rpc_port = 8899
 
 [[test.genesis]]
 address = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY"
@@ -38,3 +33,8 @@ program = "target/deploy/spl_account_compression.so"
 [[test.genesis]]
 address = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
 program = "target/deploy/spl_noop.so"
+
+[test.validator]
+bind_address = "127.0.0.1"
+ledger = ".anchor/test-ledger"
+rpc_port = 8899
