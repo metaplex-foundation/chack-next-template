@@ -190,7 +190,7 @@ describe('chack_staking', () => {
 
     // Get the Merkle tree root and proof from the RPC response.
     root = assetProof?.result?.root;
-    proof = assetProof?.result.proof;
+    proof = assetProof?.result?.proof;
     if (!root || !proof) {
       throw new Error('Could not find required asset proof data in RPC response');
     }
@@ -256,7 +256,7 @@ describe('chack_staking', () => {
 
     // Get the updated Merkle tree root and proof from the RPC response.
     root = assetProof?.result?.root;
-    proof = assetProof?.result.proof;
+    proof = assetProof?.result?.proof;
     if (!root || !proof) {
       throw new Error('Could not find required asset proof data in RPC response');
     }
