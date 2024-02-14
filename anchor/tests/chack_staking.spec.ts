@@ -41,9 +41,11 @@ describe('chack_staking', () => {
 
   // This will be our cNFT owner.  Using a known keypair derivation so that
   // devnet SOL can be airdropped separately.
-  const seed = Uint8Array.from(Buffer.from('chack-test-keypair-cnft-owner777'));
+  const slice = program.programId.toString().slice(0, 14);
+  const seed = Uint8Array.from(Buffer.from('chack-test-keypair' + slice));
   const cNftOwnerKeypair = Keypair.fromSeed(seed);
   const cNftOwner = cNftOwnerKeypair.publicKey;
+  console.log('cNFT owner wallet: ', cNftOwner.toString());
 
   // This type enforces a valid `maxDepth` and `maxBufferSize` pair.
   const depthSizePair: ValidDepthSizePair = {
