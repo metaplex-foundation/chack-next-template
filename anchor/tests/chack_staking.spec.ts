@@ -140,10 +140,14 @@ describe('chack_staking', () => {
 
       // Find the inner instruction that represents the Bubblegum call to the Noop program.
       let innerInstructions = response?.meta?.innerInstructions;
-      console.log(innerInstructions);
       if (!innerInstructions) {
         throw new Error('Could not parse leaf from transaction');
       }
+
+      console.log(response?.transaction);
+      innerInstructions.forEach(instruction => {
+        console.log(instruction);
+      })
 
       // Deserialize the data from the call to the Noop program into a `LeafSchema` event struct.
       let buffer = bs58.decode(innerInstructions[0].instructions[1].data);
