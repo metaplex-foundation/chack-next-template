@@ -83,8 +83,9 @@ describe('chack_staking', () => {
 
   let dataHash: undefined | string;
   let creatorHash: undefined | string;
-  let root: undefined | string;
   let leafId: undefined | string;
+  let root: undefined | string;
+  let proof: undefined | string[];
 
   it('Create a tree', async () => {
     // Create Merkle tree account.
@@ -187,11 +188,24 @@ describe('chack_staking', () => {
       throw new Error('Could not get asset proof from RPC');
     }
 
-    // Get the Merkle tree root from the RPC response.
+    // Get the Merkle tree root and proof from the RPC response.
     root = assetProof?.result?.root;
-    if (!root) {
-      throw new Error('Could not find root in RPC response');
+    proof = assetProof?.result.proof;
+    if (!root || !proof) {
+      throw new Error('Could not find required asset proof data in RPC response');
     }
+
+    // The Merkle proof will be sent to the instruction as remaining accounts.
+    let remainingAccounts: anchor.web3.AccountMeta[] = [];
+    proof.forEach(proof => {
+      remainingAccounts.push(
+        {
+          pubkey: new PublicKey(proof),
+          isSigner: false,
+          isWritable: false,
+        }
+      );
+    })
 
     // Stake `cNftOwnerKeypair`'s cNFT, sending in the cNFT parameters from the RPC DAS provider.
     const signature = await program.methods
@@ -210,6 +224,7 @@ describe('chack_staking', () => {
       logWrapper: SPL_NOOP_PROGRAM_ID,
       compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
       })
+      .remainingAccounts(remainingAccounts)
       .signers([cNftOwnerKeypair])
       .rpc({
       skipPreflight:true
@@ -224,24 +239,41 @@ describe('chack_staking', () => {
   }, 60000);
 
   it('Unstake a cNFT', async () => {
-    // Call `getAssetProof` from an RPC DAS provider, since the Merkle tree changed when
-    // the cNFT was transferred to a new owner by the `stakeCnft` instruction.
-    let assetProof = await getAssetProof(assetId);
-    if (!assetProof) {
-      throw new Error('Could not get Asset from RPC');
-    }
-    // Get the updated Merkle tree root from the RPC response.
-    root = assetProof?.result?.root;
-    if (!root) {
-      throw new Error('Could not find root in RPC response');
-    }
-
+    // The `dataHash`, `creatorHash`, and `leafId` can be reused since they were not changed by
+    // the `stakeCnft` instruction.
     if (!dataHash || !creatorHash || leafId == undefined) {
       throw new Error('Could not find required asset data in RPC response');
     }
 
-    // Stake `cNftOwnerKeypair`'s cNFT.  The `dataHash`, `creatorHash`, and `leafId` values can be
-    // reused from the previous RPC call since those were not changed by transferring the cNFT.
+    // The Merkle tree root changed when the cNFT was transferred to a new owner by the `stakeCnft`
+    // instruction, so that needs to be read again from the RPC DAS provider.  The Merkle proof can
+    // change if another node in the tree is changed, so it is a good idea to get a new Merkle
+    // proof as well.
+    let assetProof = await getAssetProof(assetId);
+    if (!assetProof) {
+      throw new Error('Could not get Asset from RPC');
+    }
+
+    // Get the updated Merkle tree root and proof from the RPC response.
+    root = assetProof?.result?.root;
+    proof = assetProof?.result.proof;
+    if (!root || !proof) {
+      throw new Error('Could not find required asset proof data in RPC response');
+    }
+
+    // The Merkle proof will be sent to the instruction as remaining accounts.
+    let remainingAccounts: anchor.web3.AccountMeta[] = [];
+    proof.forEach(proof => {
+      remainingAccounts.push(
+        {
+          pubkey: new PublicKey(proof),
+          isSigner: false,
+          isWritable: false,
+        }
+      );
+    })
+
+    // Stake `cNftOwnerKeypair`'s cNFT, sending in the cNFT parameters from the RPC DAS provider.
     const signature = await program.methods
       .unstakeCnft(
         Array.from(bs58.decode(root)),
@@ -259,6 +291,7 @@ describe('chack_staking', () => {
         logWrapper: SPL_NOOP_PROGRAM_ID,
         compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
       })
+      .remainingAccounts(remainingAccounts)
       .signers([cNftOwnerKeypair])
       .rpc({
         skipPreflight:true
