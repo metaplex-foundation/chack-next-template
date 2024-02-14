@@ -1,18 +1,40 @@
+[toolchain]
+
 [features]
 seeds = false
 skip-lint = false
-[programs.localnet]
-counter = "EuJfgknXicf6iZASeagt5U6XDDPpLTQrvWPW31vgAwo8"
+
+[programs.devnet]
+chack_staking = "4XPcw6GVcxTq56ABXMALvdbkqvsY35d6iZLWm46m8mbp"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "../node_modules/.bin/nx run anchor:jest"
 
+[test]
+startup_wait = 5000
+shutdown_wait = 2000
+upgradeable = false
+
+[[test.genesis]]
+address = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY"
+program = "target/deploy/bubblegum.so"
+
+[[test.genesis]]
+address = "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK"
+program = "target/deploy/spl_account_compression.so"
+
+[[test.genesis]]
+address = "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
+program = "target/deploy/spl_noop.so"
+
 [test.validator]
 bind_address = "127.0.0.1"
+ledger = ".anchor/test-ledger"
+rpc_port = 8899

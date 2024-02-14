@@ -29,7 +29,7 @@ cd <repo-name>
 #### Install Dependencies
 
 ```shell
-npm run install
+npm install
 ```
 
 #### Start the web app
@@ -48,6 +48,12 @@ This is a Solana program written in Rust using the Anchor framework.
 
 You can use any normal anchor commands. Either move to the `anchor` directory and run the `anchor` command or prefix the command with `npm run`, eg: `npm run anchor`.
 
+#### Install Dependencies needed for Anchor
+
+```shell
+npm install
+```
+
 #### Sync the program id:
 
 Running this command will create a new keypair in the `anchor/target/deploy` directory and save the address to the Anchor config file and update the `declare_id!` macro in the `./src/lib.rs` file of the program.
@@ -58,28 +64,41 @@ You will manually need to update the constant in `anchor/lib/counter-exports.ts`
 npm run anchor keys sync
 ```
 
+## Set up local environment variables
+
+Some of the tests are using a devnet ReadAPI RPC to ensure the Read API client is working as expected. To run these tests locally, you'll need to set up the `READ_API_RPC_DEVNET` environment variable. Simply add a `.env` file in the `anchor` directory and add the variable to it.
+
+```shell
+cp anchor/.env.example anchor/.env
+
+# Edit the .env file and add the following line.
+READ_API_RPC_DEVNET="INSERT_RPC_ENDPOINT_HERE"
+```
+
+
 #### Build the program:
 
 ```shell
 npm run anchor-build
 ```
 
-#### Start the test validator with the program deployed:
-
-```shell
-npm run anchor-localnet
-```
-
 #### Run the tests
-
+Note that the Anchor.toml configuration is setup to deploy and run the tests on devnet.
 ```shell
 npm run anchor-test
 ```
 
 #### Deploy to Devnet
-
+This step is not needed with the default Anchor.toml configuration as the tests will automatically deploy to devnet.
 ```shell
 npm run anchor deploy --provider.cluster devnet
+```
+
+#### Dump Programs:
+
+If running on localnet, this script will dump the required programs.
+```shell
+./dump-programs.sh
 ```
 
 ### web
